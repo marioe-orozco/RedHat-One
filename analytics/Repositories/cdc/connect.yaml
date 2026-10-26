@@ -1,0 +1,14 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect
+metadata:
+  name: fraud-kafka-connect
+  namespace: kafka
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  bootstrapServers: fraud-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
+  replicas: 1
+  build:
+    output:
+      type: imagestream     
+      

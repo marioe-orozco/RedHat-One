@@ -1,0 +1,24 @@
+# Archivos del Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Editores de código
+.vscode/
+.idea/
+
+# Binarios y cachés de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# Cachés de Python / Photon
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.env

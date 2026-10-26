@@ -1,0 +1,24 @@
+---
+- name: Reglas SRE para Auto-Sanación del Pipeline SPEI
+  hosts: all
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+  rules:
+    - name: Detectar incremento alto de TPS o Consumer Lag
+      condition: event.payload.alert_name == "HighConsumerLagOrTPS"
+      action:
+        run_job_template:
+          name: "SPEI - Auto Scale Inference Pods"
+          organization: "Default"
+          job_args:
+            extra_vars:
+              target_replicas: 8
+
+    - name: Detectar degradación de servicio en Pod
+      condition: event.payload.alert_name == "PodDegradedError"
+      action:
+        run_job_template:
+          name: "SPEI - Restart Degraded Pod"
+          organization: "Default"

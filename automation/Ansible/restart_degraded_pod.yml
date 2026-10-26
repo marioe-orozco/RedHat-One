@@ -1,0 +1,16 @@
+---
+- name: Reinicio Controlado de Pods Degradados
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    target_namespace: "redhat-one-rf-demo"
+    pod_label: "app=spei-enricher"
+  tasks:
+    - name: Eliminar pods degradados
+      kubernetes.core.k8s:
+        state: absent
+        kind: Pod
+        namespace: "{{ target_namespace }}"
+        label_selectors:
+          - "{{ pod_label }}"

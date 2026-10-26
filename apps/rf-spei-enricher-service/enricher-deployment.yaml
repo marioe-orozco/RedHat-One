@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spei-enricher-sa
+  namespace: redhat-one-rf-demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spei-enricher
+  namespace: redhat-one-rf-demo
+  labels:
+    app: spei-enricher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spei-enricher
+  template:
+    metadata:
+      labels:
+        app: spei-enricher
+    spec:
+      serviceAccountName: spei-enricher-sa
+      hostNetwork: true
+      hostAliases:
+      - ip: "10.217.5.92"
+        hostnames:
+        - "spei-kafka-cluster-kafka-bootstrap.kafka.svc"
+        - "spei-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local"
+        - "spei-kafka-cluster-spei-kafka-pool-0.spei-kafka-cluster-kafka-brokers.kafka.svc"
+        - "spei-kafka-cluster-spei-kafka-pool-1.spei-kafka-cluster-kafka-brokers.kafka.svc"
+        - "spei-kafka-cluster-spei-kafka-pool-2.spei-kafka-cluster-kafka-brokers.kafka.svc"
+      containers:
+      - name: spei-enricher
+        image: default-route-openshift-image-registry.apps-crc.testing/redhat-one-rf-demo/spei-enricher:latest
+        imagePullPolicy: Always
+        env:
+        - name: KAFKA_BROKERS
+          value: "10.217.5.92:9092"
+        - name: REDIS_ADDR
+          value: "10.217.4.154:6379"
+        - name: POSTGRES_CONN
+          value: "postgres://fraud_user:fraud_password@10.217.4.240:5432/frauddb?sslmode=disable"
+        - name: INBOUND_TOPIC
+          value: "spei_raw_inbound"
+        - name: ENRICHED_TOPIC
+          value: "spei_enriched"
+        - name: NOT_FOUND_TOPIC
+          value: "spei_not_found"
+        - name: CONSUMER_GROUP
+          value: "spei-enricher-group"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+            - ALL

@@ -1,0 +1,23 @@
+---
+- name: Auto-Escalado Dinámico de Microservicios SPEI
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    target_namespace: "redhat-one-rf-demo"
+    deployment_name: "spei-enricher"
+    target_replicas: 5
+  tasks:
+    - name: Notificar inicio de auto-healing
+      ansible.builtin.debug:
+        msg: "Alerta recibida: Escalando {{ deployment_name }} a {{ target_replicas }} réplicas"
+
+    - name: Incrementar réplicas del deployment
+      kubernetes.core.k8s:
+        state: patched
+        kind: Deployment
+        name: "{{ deployment_name }}"
+        namespace: "{{ target_namespace }}"
+        definition:
+          spec:
+            replicas: "{{ target_replicas | int }}"

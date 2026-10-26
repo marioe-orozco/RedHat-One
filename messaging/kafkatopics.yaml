@@ -1,0 +1,57 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: spei-raw-inbound
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: kafka-cluster-redhat-one
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: spei-enriched
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: kafka-cluster-redhat-one
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: spei-evaluated
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: kafka-cluster-redhat-one
+spec:
+  partitions: 3
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: spei-dlq
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: kafka-cluster-redhat-one
+spec:
+  partitions: 1
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: spei-not-found
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: kafka-cluster-redhat-one
+spec:
+  partitions: 3
+  replicas: 1  
+
+
+

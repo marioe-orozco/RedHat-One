@@ -1,0 +1,25 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect
+metadata:
+  name: fraud-kafka-connect
+  namespace: kafka
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  bootstrapServers: spei-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
+  replicas: 1
+  groupId: connect-cluster-group
+  configStorageTopic: connect-cluster-configs
+  offsetStorageTopic: connect-cluster-offsets
+  statusStorageTopic: connect-cluster-status
+  build:
+    output:
+      type: imagestream
+      image: kafka-connect-debezium:latest
+    plugins:
+      - name: debezium-postgres-plugin
+        artifacts:
+          - type: tgz
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/2.5.0.Final/debezium-connector-postgres-2.5.0.Final-plugin.tar.gz
+  config:
+    plugin.path: "/opt/kafka/plugins/debezium-postgres-plugin"
