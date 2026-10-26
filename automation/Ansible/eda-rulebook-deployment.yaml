@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spei-eda-rulebook-sre
+  namespace: ansible-automation-platform
+  labels:
+    app: spei-eda-rulebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spei-eda-rulebook
+  template:
+    metadata:
+      labels:
+        app: spei-eda-rulebook
+    spec:
+      containers:
+      - name: rulebook-runner
+        image: quay.io/ansible/eda-ansible-rulebook:latest
+        args:
+          - ansible-rulebook
+          - --rulebook
+          - /env/eda-rulebook-sre.yml
+          - -i
+          - inventory.yml
+          - --verbose
+        ports:
+        - containerPort: 5000
+          name: webhook
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spei-eda-webhook-svc
+  namespace: ansible-automation-platform
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+    name: webhook
+  selector:
+    app: spei-eda-rulebook
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: spei-eda-webhook-route
+  namespace: ansible-automation-platform
+spec:
+  to:
+    kind: Service
+    name: spei-eda-webhook-svc
+  port:
+    targetPort: webhook
